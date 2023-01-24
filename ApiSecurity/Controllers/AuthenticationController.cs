@@ -14,8 +14,16 @@ namespace ApiSecurity.Controllers
         public ActionResult<string> Authenticate([FromBody] AuthenticateData data)
         {
 
+            var user = ValidateCredentials(data);
+
+            if (user == null)
+                return Unauthorized();
+
+
 
         }
+
+        private GenerateUserToken()
 
         private static UserData? ValidateCredentials(AuthenticateData data)
         {
