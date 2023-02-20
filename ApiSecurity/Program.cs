@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -11,9 +14,13 @@ builder.Services.AddAuthentication("Bearer")
     {
         opts.TokenValidationParameters = new()
         {
-            
             ValidateIssuer = true,
-            ValidateIssuerSigningKey = true
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration.GetValue<string>("Authentication:Issuer"),
+            ValidAudience = builder.Configuration.GetValue<string>("Authentication:Audience"),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+                builder.Configuration.GetValue<string>("Authentication:SecretKey")))
         };
     });
 
@@ -28,6 +35,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//order is important
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
